@@ -1,0 +1,19 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+robotframework = "==7.1"
+robotframework-appiumlibrary = "==2.1.0"
+robotframework-pythonlibcore = "==4.4.1"
+robotframework-seleniumlibrary = "==6.6.1"
+selenium = "==4.16.0"
+webdriver-manager = "==4.0.2"
+robotframework-tidy = "==4.14.0"
+selenium-stealth = "==1.0.6"
+
+[dev-packages]
+
+[requires]
+python_version = "3.8"

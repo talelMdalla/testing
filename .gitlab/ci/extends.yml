@@ -1,0 +1,49 @@
+.install:api:
+  tags:
+    - saas-linux-small-amd64
+  before_script:
+    - |
+      if [ -d "venv" ]; then
+        echo "Using cached virtualenv..."
+      else
+        echo "Creating new virtualenv..."
+        pip install virtualenv
+        virtualenv -p python3 venv
+        source ./venv/bin/activate
+        pip install -r requirements.txt
+      fi
+    - source ./venv/bin/activate
+
+.robot_test_template:
+  extends:
+    - .install:api
+  script:
+    - |
+      if [[ "$CI_COMMIT_REF_NAME" == "master" ]]; then
+        VERBOSITY="PROD"
+      else
+        VERBOSITY="DEV"
+      fi
+      robot --outputdir results -v ENV:$VERBOSITY -i $TEST_TAG $TEST_PATH
+  after_script:
+    - if [ "$CI_JOB_STATUS" != "success" ]; then echo $CI_JOB_STAGE > failed_stage.txt; fi
+  artifacts:
+    when: always
+    paths:
+      - results/
+      - failed_stage.txt
+    expire_in: 1 day
+  dependencies:
+    - install_dependencies
+
+.notify:hook:
+  script:
+    - >
+      curl -X POST --data-urlencode
+      "payload={
+        \"channel\": \"#test-web\",
+        \"username\": \"DAXme Test\",
+        \"text\": \":$TEXT_EMOJI: $TEXT\",
+        \"icon_emoji\": \":$EMOJI:\"
+      }"
+      $SLACK_WEBHOOK_URL
