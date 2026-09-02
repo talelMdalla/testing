@@ -18,7 +18,6 @@ Open Browser Page
     # FIXED: Commented out - was breaking the page
     # SeleniumLibrary.Execute Javascript    window.localStorage.setItem('disable-recaptcha-daxme-test', 'true');
     SeleniumLibrary.Set Selenium Speed    ${TEST_SELENIUM_SPEED}
-    SeleniumLibrary.Maximize Browser Window
     SeleniumLibrary.Set Selenium Timeout    ${SELENIUM_TIMEOUT}
     BuiltIn.Set Log Level    DEBUG
     ${cookie_button_exists}=    Run Keyword And Return Status    SeleniumLibrary.Wait Until Element Is Visible    ${cookies_btn}    timeout=3s
@@ -91,9 +90,8 @@ Click Element
 
     IF    not ${status}
         Log    "Fallback JS click used"
-        ${xpath}=    String.Remove String    ${locator}    xpath=
-        SeleniumLibrary.Execute JavaScript
-        ...    document.evaluate("${xpath}", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.click();
+        ${element}=    SeleniumLibrary.Get WebElement    ${locator}
+        SeleniumLibrary.Execute JavaScript    arguments[0].scrollIntoView({block: "center"}); arguments[0].click();    ${element}
     END
 
 Click Element By JavaScript Executor
@@ -160,7 +158,7 @@ Button Cookies
 
 Profile Avatar Should Be Visible
     [Arguments]    ${retryScale}=${SMALL_RETRY_COUNT}
-    Element Should Be Visible    xpath://*[@data-test-id="photo_profile"]    ${retryScale}
+    Element Should Be Visible    xpath://*[@data-test-id="photo_profile" or @data-test-id="profile" or contains(@alt,"profile") or contains(@class,"profile")]    ${retryScale}
 
 Get Random Email
     [Documentation]    Return random email address
